@@ -1,4 +1,4 @@
-from  Face import Face
+from Face import Face, AnimationTypes
 import time
 import pygame
 from pygame.locals import *
@@ -20,20 +20,20 @@ if __name__ == "__main__":
         if time.time() - start_time > 1 and not ran:
             ran = True
             animation_info = {
-                'duration': 1,
-                'type':'linear',
-                'data':{
-                    'objects': [
+                'data':[
                         {
+                            'type': AnimationTypes.LINEAR,
                             'name': 'left_eye.center',
-                            'target': [0.15, 0.35]
+                            'target': [0.15, 0.35],
+                            'duration': 1,
                         },
                         {
+                            'type': AnimationTypes.LINEAR,
                             'name': 'right_eye.center',
-                            'target': [0.65, 0.35]
+                            'target': [0.65, 0.35],
+                            'duration': 2,
                         },
                     ]
-                }
             }
             f.run_animation(animation_info)
         

@@ -6,6 +6,11 @@ import numpy as np
 import pygame
 import pygame.gfxdraw
 import time
+from enum import Enum
+
+class AnimationTypes(Enum):
+    LINEAR = 0
+    ACCELERATE_DECCELERATE = 1
 
 
 class Face:
@@ -186,17 +191,19 @@ class Face:
     def _update_state(self):
 
         if self._animating:
-            # get the state since animations started
-            progress = (self.get_time_now() - self._animation_info['start_time'])/self._animation_info['duration']
-            if progress >= 1:
-                # ending conditions
-                self._animating = False
-                progress = 1
-            # interpolate the information
-            if self._animation_info['type'] == "linear":
-                data = self._animation_info['data']
-                for obj in data['objects']:
-                    obj_name = obj['name']
+
+            running = False
+            # go through each object
+            for obj in self._animation_info['objects']:
+                # figure out the progress
+                progress = (self.get_time_now() - self._animation_info['start_time'])/obj['duration']
+                if progress >= 1:
+                    progress = 1
+                else:
+                    running = True
+                obj_name = obj['name']
+
+                if AnimationTypes(obj['type']) == AnimationTypes.LINEAR:
                     if 'min' not in obj:
                         obj['min'] = self._get_state_value(obj_name)
                     if type(obj['target']) == list:
@@ -205,7 +212,10 @@ class Face:
                             curr_val[i] = (obj['target'][i] - obj['min'][i]) * progress + obj['min'][i]
                     else:
                         curr_val = (obj['target'] - obj['min']) * progress + obj['min']  
-                    self._set_state_value(obj_name, curr_val)
+                    self._set_state_value(obj_name, curr_val)   
+            
+            # set if we are still runnin
+            self._animating = running
         else:
             # run idle motion code
             # determine if the face should blink or not
@@ -234,36 +244,24 @@ class Face:
     def run_animation(self, animation_info: dict, start_time: float = None) -> None:
         self._animation_info = animation_info
         self._animation_info['start_time'] = start_time if start_time != None else self.get_time_now()
+        # find the longest duration
+        max_time = 0
+        for obj in self._animation_info['objects']:
+            max_time = np.max([obj['duration'], max_time])
+        self._animation_info['duration'] = max_time
         self._animating = True
 
-#     def spin(self):
-#         refresh_rate = rospy.Rate(60)
-#         while not rospy.is_shutdown():
-#             # Run any code to update the face state
-#             self._update_state()
-#             # draw the surface that makes baxter's face
-#             self._draw_face()
-#             # send the image to baxter's face
-#             self.send_screen()
-#             # display it on local machine if set to true
-#             if self._display_local:
-#                 self._local_window.blit(self._screen, (0, 0))
-#                 pygame.display.update()
-#             # refresh the screen
-#             refresh_rate.sleep()
-
-# def main():
-#     # initialize node
-#     rospy.init_node('baxter_face_controller')
-
-#     # get rosparam
-#     pub_topic = rospy.get_param("topic_name", 'face_image')
-#     run_local = rospy.get_param("run_local", True)
-
-#     server = FaceServer(pub_topic, run_local)
-#     # loop forever
-#     server.spin()
+    def stop_animation(self):
+        if self._animating:
+            self._animating = False
+            self._animation_info = None
 
 
-# if __name__ == '__main__':
-#     main()
+    def wait_for_animation(self, timeout = None):
+        wait_start_time = self.get_time_now()
+        while self._animating:
+            # sleep until timeout
+            if timeout != None and (self.get_time_now() - wait_start_time) > timeout:
+                return False
+            time.sleep(0.01)
+        return True

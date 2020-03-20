@@ -11,19 +11,49 @@ from sensor_msgs.msg import (
     Image,
     CompressedImage
 )
-from .Face.Face import Face
+from Face.Face import Face
+from tbd_ros_msgs.msg import (
+    faceAnimationResult,
+    faceAnimationAction,
+    faceAnimationGoal
+)
+import actionlib 
+import yaml
 
 
 class FaceServer:
 
+    _animation_server: actionlib.SimpleActionServer
+    _face: Face
+
     def __init__(self, topic, run_local=False, width=1280, height=720):
 
+        self._pub_topic_name = topic
         self._face = Face(run_local, width, height)
-        #TODO use ImageTranporter instead
         self._img_pub = rospy.Publisher(
             self._pub_topic_name, Image, latch=True, queue_size=1)
+        # We use our own compression topic instead of ImageTransport because ImageTransport doesn't have a python API.
         self._compressed_img_pub = rospy.Publisher(
             self._pub_topic_name + '/compressed', CompressedImage, latch=True, queue_size=1)
+
+        # To take advantage of stuff like progress, we would need to implement our own action server.
+        self._animation_server = actionlib.SimpleActionServer("animation", faceAnimationAction, execute_cb=self._animation_cb, auto_start=False)
+        self._animation_server.register_preempt_callback(self._animation_preempted_cb)
+        self._animation_server.start()
+
+    def _animation_preempted_cb(self):
+        rospy.loginfo("Pre-empting face animation ...")
+        self._face.stop_animation()
+
+    def _animation_cb(self, goal: faceAnimationGoal):
+        data = yaml.safe_load(str(goal))
+        self._face.run_animation(data)
+        result = faceAnimationResult()
+        result.success = self._face.wait_for_animation()
+        if self._animation_server.is_preempt_requested:
+            self._animation_server.set_preempted(result)
+        else:
+            self._animation_server.set_succeeded(result)
 
     def _send_image(self, img_data):
         # send uncompressed
@@ -47,7 +77,7 @@ class FaceServer:
             # Update the face
             self._face.update_once()
             # send the image to baxter's face
-            self.send_screen(self._face.get_screen_as_bmp())
+            self._send_image(self._face.get_screen_as_bmp())
             # refresh the screen
             refresh_rate.sleep()
 
