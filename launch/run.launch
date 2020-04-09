@@ -1,5 +1,10 @@
 <launch>
     <arg name="output" default="screen"/>
+    <arg name="topic_name" default="/robot_face"/>
+    <arg name="display_local" default="true"/>
     
-	<node name="face_server" pkg="tbd_screen_face" type="faceController.py" output="$(arg output)"/>
+	<node name="face_server" pkg="tbd_screen_face" type="faceController.py" output="$(arg output)">
+        <param name="topic_name" value="$(arg topic_name)" />
+        <param name="display_local" value="$(arg display_local)" />
+    </node>
 </launch>

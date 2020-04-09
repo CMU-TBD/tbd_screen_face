@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python
 
 import os
 import typing
@@ -86,8 +86,8 @@ def main():
     rospy.init_node('baxter_face_controller')
 
     # get rosparam
-    pub_topic = rospy.get_param("topic_name", 'face_image')
-    run_local = rospy.get_param("run_local", True)
+    pub_topic = rospy.get_param("~topic_name", 'face_image')
+    run_local = rospy.get_param("~run_local", True)
 
     server = FaceServer(pub_topic, run_local)
     # loop forever
