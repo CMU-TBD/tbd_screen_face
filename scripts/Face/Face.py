@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python
 
 import os
 import typing
@@ -12,7 +12,6 @@ class AnimationTypes(Enum):
     LINEAR = 0
     ACCELERATE_DECCELERATE = 1
 
-
 class Face:
 
     _width: int
@@ -20,11 +19,12 @@ class Face:
 
     _display_local: bool # Whether the screen is shown on the local machine
 
+    _running: bool # Whether we are running
     _animating: bool # Whether the face is undergoing animations
     _animation_info: dict # Information about dictionary
     _face_states: dict # Representing the information about the face
 
-    def __init__(self, display_local=False, width=1280, height=720):
+    def __init__(self, display_local: bool = False, width: int = 1280, height: int = 720):
         pygame.init()
 
         self._width = width
@@ -52,6 +52,10 @@ class Face:
                 'center': [0.75, 0.35],
                 'width': 0.2,
                 'height': 0.5,
+                'eye_brow': {
+                    'thickness': 40,
+                    'distance': "50px",
+                }
             },
             'blink': {
                 'duration': 0.5,  # second long
@@ -62,8 +66,18 @@ class Face:
             },
             'background_color': [255, 100, 100]
         }
+
         self._animating = False
         self._animation_info = {}
+
+        self._running = True
+
+
+    def get_face_width(self) -> int:
+        return self._width
+
+    def get_face_height(self) -> int:
+        return self._height
 
 
     def _get_eye_rect(self, eye_info):
@@ -78,8 +92,17 @@ class Face:
         return pygame.Rect(eye_corner_x, eye_corner_y, eye_width, eye_height)
 
     def get_time_now(self) -> float:
+        """Return the current time (since epoch) in seconds.
+
+        Returns
+        -------
+        float
+            Current time in seconds
+        """
         return time.time()
 
+    def sleep(self, sleep_time: float) -> None:
+        time.sleep(sleep_time)
 
     def draw_face(self):
         """Draw Baxter's face on the surface
@@ -241,7 +264,38 @@ class Face:
             self._local_window.blit(self._screen, (0, 0))
             pygame.display.update()
 
-    def run_animation(self, animation_info: dict, start_time: float = None) -> None:
+    def update(self, timeout: float = -1, hz: float = 60) -> None:
+        
+        start_time = self.get_time_now()
+        cycle_time = 1/hz
+        last_time = start_time
+        expected_end_time = start_time + timeout
+        while (timeout != -1 and expected_end_time > self.get_time_now()) and self._running:
+
+            self.update_once()
+
+            # sleep if not enough time passed
+            curr_time = self.get_time_now()
+            sleep_time = (self.get_time_now() - last_time) - cycle_time
+            if sleep_time > 0:
+                self.sleep(sleep_time)
+            last_time = curr_time
+            
+
+        
+
+
+
+    def start_animation(self, animation_info: dict, start_time: float = None) -> None:
+        """Start animating the face based on the animation given by animation_info
+
+        Parameters
+        ----------
+        animation_info : dict
+            A dict in a specific format describing the animation to do
+        start_time : float, optional
+            starting time for the animation, could be in the future, by default None
+        """
         self._animation_info = animation_info
         self._animation_info['start_time'] = start_time if start_time != None else self.get_time_now()
         # find the longest duration
