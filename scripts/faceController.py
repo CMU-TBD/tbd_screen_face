@@ -36,7 +36,7 @@ class FaceServer:
         self._compressed_img_pub = rospy.Publisher(
             self._pub_topic_name + '/compressed', CompressedImage, latch=True, queue_size=1)
 
-        # To take advantage of stuff like progress, we would need to implement our own action server.
+        # To take advantage of stuff like progress, we would need to use the main our own action server.
         self._animation_server = actionlib.SimpleActionServer("animation", faceAnimationAction, execute_cb=self._animation_cb, auto_start=False)
         self._animation_server.register_preempt_callback(self._animation_preempted_cb)
         self._animation_server.start()
@@ -47,7 +47,7 @@ class FaceServer:
 
     def _animation_cb(self, goal: faceAnimationGoal):
         data = yaml.safe_load(str(goal))
-        self._face.run_animation(data)
+        self._face.start_animation(data)
         result = faceAnimationResult()
         result.success = self._face.wait_for_animation()
         if self._animation_server.is_preempt_requested:

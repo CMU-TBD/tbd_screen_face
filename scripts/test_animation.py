@@ -4,7 +4,6 @@ from tbd_ros_msgs.msg import (
     faceAnimationGoal,
     faceAnimationAction,
     FaceAnimationObject,
-    speakToActionGoal
 )
 import actionlib 
 
