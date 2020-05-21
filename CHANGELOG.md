@@ -1,6 +1,10 @@
 
 
 # Changelog:
+## [Unreleased]
+
+#### Changed
+- Changed the screen's framerate from 60 to 30.
 
 ## [2020-05-11] - 0.0.2
 #### Added

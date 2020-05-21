@@ -72,7 +72,7 @@ class FaceServer:
                 self._compressed_img_pub.publish(compressed_msg)
 
     def spin(self):
-        refresh_rate = rospy.Rate(60)
+        refresh_rate = rospy.Rate(30)
         while not rospy.is_shutdown():
             # Update the face
             self._face.update_once()
