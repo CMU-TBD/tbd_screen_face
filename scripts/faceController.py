@@ -23,8 +23,8 @@ import yaml
 
 class FaceServer:
 
-    _animation_server: actionlib.SimpleActionServer
-    _face: Face
+    _animation_server = actionlib.SimpleActionServer
+    _face = Face
 
     def __init__(self, topic, run_local=False, width=1280, height=720):
 
@@ -45,7 +45,7 @@ class FaceServer:
         rospy.loginfo("Pre-empting face animation ...")
         self._face.stop_animation()
 
-    def _animation_cb(self, goal: faceAnimationGoal):
+    def _animation_cb(self, goal = faceAnimationGoal):
         data = yaml.safe_load(str(goal))
         self._face.start_animation(data)
         result = faceAnimationResult()
@@ -80,6 +80,7 @@ class FaceServer:
             self._send_image(self._face.get_screen_as_bmp())
             # refresh the screen
             refresh_rate.sleep()
+
 
 def main():
     # initialize node
