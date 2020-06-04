@@ -33,16 +33,16 @@ jobs:
         with:
           repository: cmu-tbd/ros_pytest
           path: ros_ws/src/ros_pytest
-      - name: Install Dependencies
-        run: |
-          source /opt/ros/${{matrix.ros_distributions}}/setup.bash
-          rosdep update
-          rosdep install -i --from-paths ros_ws/src
+      # - name: Install Dependencies
+      #   run: |
+      #     source /opt/ros/${{matrix.ros_distributions}}/setup.bash
+      #     rosdep update
+      #     rosdep install -i --from-paths ros_ws/src
       - name: Install Python Dependencies
         run: |
           python3 -m venv venv
           source venv/bin/activate
-          pip install python3
+          pip install pygame pytest
       - name: Catkin Build
         run: |
           source /opt/ros/${{matrix.ros_distributions}}/setup.bash
