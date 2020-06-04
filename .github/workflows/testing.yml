@@ -29,6 +29,9 @@ jobs:
       - uses: actions/checkout@v2
         with:
           path: ros_ws/src/tbd_screen_face
+      - uses: actions/checkout@v2
+        with:
+          path: ros_ws/src/ros_pytest
       - name: Install Dependencies
         run: |
           source /opt/ros/${{matrix.ros_distributions}}/setup.bash
