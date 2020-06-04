@@ -47,7 +47,7 @@ jobs:
         run: |
           source /opt/ros/${{matrix.ros_distributions}}/setup.bash
           source venv/bin/activate
-          cd ros_ws/src
+          cd ros_ws
           catkin build -DPYTHON_VERSION=3
       - name: Catkin Test
         run: |
