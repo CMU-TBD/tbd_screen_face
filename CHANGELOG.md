@@ -2,9 +2,13 @@
 
 # Changelog:
 ## [Unreleased]
+#### Added
+- test files to check if evertyhing is working.
 
 #### Changed
 - Changed the screen's framerate from 60 to 30.
+#### Fixed
+- launch file's display local parameter was passed in incorrectly.
 
 ## [2020-05-11] - 0.0.2
 #### Added

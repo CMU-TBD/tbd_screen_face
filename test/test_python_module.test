@@ -1,0 +1,4 @@
+<launch>
+  <param name="test_module" value="$(find tbd_screen_face)/scripts"/>
+  <test test-name="test_face_module" pkg="ros_pytest" type="ros_pytest_runner" />
+</launch>

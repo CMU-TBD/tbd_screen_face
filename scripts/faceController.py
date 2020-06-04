@@ -87,7 +87,7 @@ def main():
 
     # get rosparam
     pub_topic = rospy.get_param("~topic_name", 'face_image')
-    run_local = rospy.get_param("~run_local", True)
+    run_local = rospy.get_param("~display_local", True)
 
     server = FaceServer(pub_topic, run_local)
     # loop forever
