@@ -31,6 +31,7 @@ jobs:
           path: ros_ws/src/tbd_screen_face
       - uses: actions/checkout@v2
         with:
+          repository: cmu-tbd/ros_pytest
           path: ros_ws/src/ros_pytest
       - name: Install Dependencies
         run: |
