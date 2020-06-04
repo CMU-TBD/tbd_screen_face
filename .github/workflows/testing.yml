@@ -33,8 +33,14 @@ jobs:
           source /opt/ros/${{matrix.ros_distributions}}/setup.bash
           rosdep update
           rosdep install -i --from-paths ros_ws/src
+      - name: Install Python Dependencies
+        run: |
+          python3 -m venv venv
+          source venv/bin/activate
+          pip install python3
       - name: Catkin Build
         run: |
           source /opt/ros/${{matrix.ros_distributions}}/setup.bash
+          source venv/bin/activate
           cd src/tbd_screen_face
-          catkin run_tests this
+          catkin run_tests -DPYTHON_VERSION=3 --this
