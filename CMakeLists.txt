@@ -198,5 +198,11 @@ include_directories(
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
 
+if(CATKIN_ENABLE_TESTING)
+  find_package(rostest REQUIRED)
+  add_rostest(test/test_python_module.test)
+  add_rostest(test/test_connection.test)
+endif()
+
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
