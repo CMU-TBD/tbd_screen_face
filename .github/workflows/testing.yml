@@ -57,5 +57,5 @@ jobs:
       - name: Check Catkin Result
         run: |
           cd ros_ws
-          source ros_ws/devel/setup.bash
+          source devel/setup.bash
           catkin_test_results
