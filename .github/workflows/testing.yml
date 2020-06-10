@@ -54,3 +54,8 @@ jobs:
           source venv/bin/activate
           cd ros_ws/src/tbd_screen_face
           catkin run_tests -DPYTHON_VERSION=3 --this
+      - name: Check Catkin Result
+        run: |
+          cd ros_ws
+          source ros_ws/devel/setup.bash
+          catkin_test_results
