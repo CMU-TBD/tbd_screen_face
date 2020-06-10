@@ -46,7 +46,7 @@ jobs:
         run: |
           python3 -m venv venv
           source venv/bin/activate
-          pip install pygame pytest empy rospkg defusedxml alloylib
+          pip install pygame pytest empy rospkg defusedxml alloylib opencv-python
       - name: Catkin Build
         run: |
           source /opt/ros/${{matrix.ros_distributions}}/setup.bash
