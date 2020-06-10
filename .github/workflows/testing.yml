@@ -33,6 +33,10 @@ jobs:
         with:
           repository: cmu-tbd/ros_pytest
           path: ros_ws/src/ros_pytest
+      - uses: actions/checkout@v2
+        with:
+          repository: cmu-tbd/tbd_ros_msgs
+          path: ros_ws/src/tbd_ros_msgs
       # - name: Install Dependencies
       #   run: |
       #     source /opt/ros/${{matrix.ros_distributions}}/setup.bash
