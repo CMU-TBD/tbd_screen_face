@@ -11,7 +11,7 @@ from sensor_msgs.msg import (
     Image,
     CompressedImage
 )
-from Face.Face import Face
+from tbd_screen_face.Face import Face
 from tbd_ros_msgs.msg import (
     faceAnimationResult,
     faceAnimationAction,
