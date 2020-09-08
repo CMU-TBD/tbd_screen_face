@@ -202,14 +202,16 @@ class Face:
         curr_state[name_arg[-1]] = val
 
 
-    def get_screen_as_bmp(self, order='bgr'):
+    def get_screen_as_bmp(self, encoding='bgr8'):
         # convert the output screen to numpy array
         ori_img_data = pygame.surfarray.array3d(self._screen)
         # change from rgb to bgr and flip the image
-        if order == 'bgr':
+        if encoding == 'bgr8':
             return np.swapaxes(np.roll(np.uint8(ori_img_data), 2, 2), 0, 1)
+        elif encoding == 'rgb8':
+            return np.swapaxes(np.uint8(ori_img_data), 0, 1)
         else:
-            return ori_img_data
+            raise NotImplementedError("encoding {} not supported".format(encoding))
 
     def _update_state(self):
 

@@ -55,10 +55,10 @@ class FaceServer:
         else:
             self._animation_server.set_succeeded(result)
 
-    def _send_image(self, img_data):
+    def _send_image(self, img_data, encoding):
         # send uncompressed
         # if (self._img_pub.get_num_connections() > 0):
-        msg = cv_bridge.CvBridge().cv2_to_imgmsg(img_data, encoding="bgr8")
+        msg = cv_bridge.CvBridge().cv2_to_imgmsg(img_data, encoding = encoding)
         self._img_pub.publish(msg)
         # send compressed
         if (self._compressed_img_pub.get_num_connections() > 0):
@@ -77,7 +77,8 @@ class FaceServer:
             # Update the face
             self._face.update_once()
             # send the image to baxter's face
-            self._send_image(self._face.get_screen_as_bmp())
+            encoding = "rgb8"
+            self._send_image(self._face.get_screen_as_bmp(encoding), encoding)
             # refresh the screen
             refresh_rate.sleep()
 
