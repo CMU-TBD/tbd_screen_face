@@ -2,6 +2,9 @@
 
 # Changelog:
 
+## [0.1.2] - 2021-02-08
+- **[Changed]** tweaked the code to not publish if there are no subscribers.
+
 ## [0.1.1] - 2020-09-08
 - **[Changed]** tweaked the encoding to use rgb by default.
 

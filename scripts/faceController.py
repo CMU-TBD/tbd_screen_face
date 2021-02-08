@@ -30,6 +30,7 @@ class FaceServer:
 
         self._pub_topic_name = topic
         self._face = Face(run_local, width, height)
+        self._cv_bridge = cv_bridge.CvBridge()
         self._img_pub = rospy.Publisher(
             self._pub_topic_name, Image, latch=True, queue_size=1)
         # We use our own compression topic instead of ImageTransport because ImageTransport doesn't have a python API.
@@ -58,18 +59,22 @@ class FaceServer:
     def _send_image(self, img_data, encoding):
         # send uncompressed
         # if (self._img_pub.get_num_connections() > 0):
-        msg = cv_bridge.CvBridge().cv2_to_imgmsg(img_data, encoding = encoding)
-        self._img_pub.publish(msg)
-        # send compressed
-        if (self._compressed_img_pub.get_num_connections() > 0):
-            compressed_msg = CompressedImage()
-            compressed_msg.header = msg.header
-            compressed_msg.format = 'jpeg'
-            encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 95]
-            result, data = cv2.imencode('.jpg', img_data, encode_param)
-            if result:
-                compressed_msg.data = data.flatten().tolist()
-                self._compressed_img_pub.publish(compressed_msg)
+        if (self._compressed_img_pub.get_num_connections() > 0 or self._img_pub.get_num_connections() > 0):
+            msg = self._cv_bridge.cv2_to_imgmsg(img_data, encoding = encoding)
+
+            # send uncompressed 
+            if (self._img_pub.get_num_connections() > 0):
+                self._img_pub.publish(msg)
+            # send compressed
+            if (self._compressed_img_pub.get_num_connections() > 0):
+                compressed_msg = CompressedImage()
+                compressed_msg.header = msg.header
+                compressed_msg.format = 'jpeg'
+                encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 95]
+                result, data = cv2.imencode('.jpg', img_data, encode_param)
+                if result:
+                    compressed_msg.data = data.flatten().tolist()
+                    self._compressed_img_pub.publish(compressed_msg)
 
     def spin(self):
         refresh_rate = rospy.Rate(30)
