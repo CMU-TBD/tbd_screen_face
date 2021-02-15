@@ -2,6 +2,9 @@
 
 # Changelog:
 
+## [0.1.3] - 2021-02-15
+- **[Added]** Allow code to change the screen size when launched.
+
 ## [0.1.2] - 2021-02-08
 - **[Changed]** tweaked the code to not publish if there are no subscribers.
 

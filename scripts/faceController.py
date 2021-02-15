@@ -25,10 +25,12 @@ class FaceServer:
 
     _animation_server: actionlib.SimpleActionServer
     _face: Face
+    _encoding: str
 
-    def __init__(self, topic, run_local=False, width=1280, height=720):
+    def __init__(self, topic, run_local=False, width=1280, height=720, encoding="rgb8"):
 
         self._pub_topic_name = topic
+        self._encoding = encoding
         self._face = Face(run_local, width, height)
         self._cv_bridge = cv_bridge.CvBridge()
         self._img_pub = rospy.Publisher(
@@ -82,8 +84,7 @@ class FaceServer:
             # Update the face
             self._face.update_once()
             # send the image to baxter's face
-            encoding = "rgb8"
-            self._send_image(self._face.get_screen_as_bmp(encoding), encoding)
+            self._send_image(self._face.get_screen_as_bmp(self._encoding), self._encoding)
             # refresh the screen
             refresh_rate.sleep()
 
@@ -94,8 +95,11 @@ def main():
     # get rosparam
     pub_topic = rospy.get_param("~topic_name", 'face_image')
     run_local = rospy.get_param("~display_local", True)
+    width = rospy.get_param("~width", 1280)
+    height = rospy.get_param("~height", 720)
+    encoding = rospy.get_param("~encoding", "rgb8")
 
-    server = FaceServer(pub_topic, run_local)
+    server = FaceServer(pub_topic, run_local, width=width, height=height, encoding=encoding)
     # loop forever
     server.spin()
 
