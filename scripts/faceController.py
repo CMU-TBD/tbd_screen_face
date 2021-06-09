@@ -19,6 +19,8 @@ from tbd_ros_msgs.msg import (
 )
 import actionlib 
 import yaml
+import dynamic_reconfigure.server
+from tbd_screen_face.cfg import FaceConfig
 
 
 class FaceServer:
@@ -26,6 +28,7 @@ class FaceServer:
     _animation_server: actionlib.SimpleActionServer
     _face: Face
     _encoding: str
+    _dyn_server: dynamic_reconfigure.server.Server
 
     def __init__(self, topic, run_local=False, width=1280, height=720, encoding="rgb8"):
 
@@ -39,10 +42,31 @@ class FaceServer:
         self._compressed_img_pub = rospy.Publisher(
             self._pub_topic_name + '/compressed', CompressedImage, latch=True, queue_size=1)
 
+        # start dynamic reconfigure client
+        self._dyn_server = dynamic_reconfigure.server.Server(FaceConfig, self._reconfigure_cb)
+
         # To take advantage of stuff like progress, we would need to use the main our own action server.
         self._animation_server = actionlib.SimpleActionServer("animation", faceAnimationAction, execute_cb=self._animation_cb, auto_start=False)
         self._animation_server.register_preempt_callback(self._animation_preempted_cb)
         self._animation_server.start()
+
+        rospy.loginfo(f"{rospy.get_name()} started.")
+
+
+
+    def _reconfigure_cb(self, config, level):
+        # set the background color
+        self._face.set_background_color([
+            config["background_color_r"],
+            config["background_color_g"],
+            config["background_color_b"]
+        ])
+        self._face.set_feature_color([
+            config["feature_color_r"],
+            config["feature_color_g"],
+            config["feature_color_b"]
+        ])
+        return config
 
     def _animation_preempted_cb(self):
         rospy.loginfo("Pre-empting face animation ...")
@@ -90,7 +114,7 @@ class FaceServer:
 
 def main():
     # initialize node
-    rospy.init_node('baxter_face_controller')
+    rospy.init_node('face_controller')
 
     # get rosparam
     pub_topic = rospy.get_param("~topic_name", 'face_image')

@@ -2,6 +2,9 @@
 
 # Changelog:
 
+## [0.1.4] - 2021-06-08
+- **[Added]** Added dynamic reconfigure parameters for background color and feature color.
+
 ## [0.1.3] - 2021-02-15
 - **[Added]** Allow code to change the screen size when launched.
 

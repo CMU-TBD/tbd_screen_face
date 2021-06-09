@@ -64,7 +64,8 @@ class Face:
                 'last_blink': self.get_time_now(),
                 'in-progress': -1,
             },
-            'background_color': [255, 100, 100]
+            'background_color': [255, 100, 100],
+            'feature_color': [0,0,0]
         }
 
         self._animating = False
@@ -79,6 +80,26 @@ class Face:
     def get_face_height(self) -> int:
         return self._height
 
+
+    def set_background_color(self, color_arr: typing.List[int]) -> None:
+        """Set the color of face's background
+
+        Parameters
+        ----------
+        color_arr : typing.List[int]
+            A size 3 array for the rgb value each in the range 0-255.
+        """
+        self._face_states["background_color"] = color_arr
+
+    def set_feature_color(self, color_arr: typing.List[int]) -> None:
+        """Set the color of face's features
+
+        Parameters
+        ----------
+        color_arr : typing.List[int]
+            A size 3 array for the rgb value each in the range 0-255.
+        """
+        self._face_states["feature_color"] = color_arr
 
     def _get_eye_rect(self, eye_info):
 
@@ -114,11 +135,11 @@ class Face:
         # draw the eyes
         # left eye
         left_eye_rect = self._get_eye_rect(self._face_states['left_eye'])
-        pygame.draw.ellipse(self._screen, pygame.Color('black'), left_eye_rect)
+        pygame.draw.ellipse(self._screen, self._face_states["feature_color"], left_eye_rect)
         # right eye
         right_eye_rect = self._get_eye_rect(self._face_states['right_eye'])
         pygame.draw.ellipse(
-            self._screen, pygame.Color('black'), right_eye_rect)
+            self._screen, self._face_states["feature_color"], right_eye_rect)
 
         # check if blinking is enable and whether we are blinking
         if (self._face_states['blink'] and self._face_states['blink']['in-progress'] != -1):
@@ -173,7 +194,7 @@ class Face:
 
             for i in range(0, eye_state['eye_brow']['thickness']):
                 pygame.gfxdraw.arc(screen, eye_center_x, eye_center_y,
-                                   int(np.floor(eye_height/2) + eye_brow_distance - i), 240, 300, pygame.Color('black'))
+                                   int(np.floor(eye_height/2) + eye_brow_distance - i), 240, 300, self._face_states["feature_color"])
 
     def _get_state_value(self, name:str):
          # split the name
