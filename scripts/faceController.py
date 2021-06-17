@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 
-import os
-import typing
 import cv2
-import numpy as np
 import cv_bridge
 import rospy
 import actionlib
@@ -17,7 +14,6 @@ from tbd_ros_msgs.msg import (
     faceAnimationAction,
     faceAnimationGoal
 )
-import actionlib 
 import yaml
 import dynamic_reconfigure.server
 from tbd_screen_face.cfg import FaceConfig
@@ -46,13 +42,12 @@ class FaceServer:
         self._dyn_server = dynamic_reconfigure.server.Server(FaceConfig, self._reconfigure_cb)
 
         # To take advantage of stuff like progress, we would need to use the main our own action server.
-        self._animation_server = actionlib.SimpleActionServer("animation", faceAnimationAction, execute_cb=self._animation_cb, auto_start=False)
+        self._animation_server = actionlib.SimpleActionServer(
+            "animation", faceAnimationAction, execute_cb=self._animation_cb, auto_start=False)
         self._animation_server.register_preempt_callback(self._animation_preempted_cb)
         self._animation_server.start()
 
         rospy.loginfo(f"{rospy.get_name()} started.")
-
-
 
     def _reconfigure_cb(self, config, level):
         # set the background color
@@ -86,9 +81,9 @@ class FaceServer:
         # send uncompressed
         # if (self._img_pub.get_num_connections() > 0):
         if (self._compressed_img_pub.get_num_connections() > 0 or self._img_pub.get_num_connections() > 0):
-            msg = self._cv_bridge.cv2_to_imgmsg(img_data, encoding = encoding)
+            msg = self._cv_bridge.cv2_to_imgmsg(img_data, encoding=encoding)
 
-            # send uncompressed 
+            # send uncompressed
             if (self._img_pub.get_num_connections() > 0):
                 self._img_pub.publish(msg)
             # send compressed
@@ -111,6 +106,7 @@ class FaceServer:
             self._send_image(self._face.get_screen_as_bmp(self._encoding), self._encoding)
             # refresh the screen
             refresh_rate.sleep()
+
 
 def main():
     # initialize node
